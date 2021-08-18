@@ -1,0 +1,77 @@
+Entity As Separate Objects(For DBRef):
+---------------------------------------------
+@Document(collection = "student")
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+public class Student {
+
+    @Id
+    private String id;
+
+    @Field(name = "name")
+    private String name;
+
+    @Field(name = "email")
+    private String email;
+
+    @DBRef
+    private Department department;
+
+    @DBRef
+    private List<Subject> subjects;
+}
+
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Document(collection = "subject")
+public class Subject {
+
+    @Id
+    private String id;
+
+//    @Field(name = "subjectName")
+    private String subjectName;
+
+    @Field(name = "marksObtained")
+    private int marksObtained;
+
+}
+
+
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Document(collection = "department")
+public class Department {
+
+    @Id
+    private String id;
+
+    @Field(name = "departmentName")
+    private String departmentName;
+
+    private String location;
+
+
+}
+
+@Repository
+public interface DepartmentRepository extends MongoRepository<Department,String> {
+}
+
+@Repository
+public interface SubjectRepository extends MongoRepository<Subject,String> {
+}
+
+Changes in Controller:
+-------------------------
+@PostMapping
+public ResponseEntity<Student> createStudents(@RequestBody Student student){
+        if(student.getDepartment()!=null){
+            departmentRepository.save(student.getDepartment());
+        }
+        if(student.getSubjects()!=null && student.getSubjects().size()>0){
+            subjectRepository.saveAll(student.getSubjects());
+}
